@@ -1,0 +1,17 @@
+{
+  "name": "linebot-cc-tracker",
+  "version": "1.0.0",
+  "description": "LINE bot for tracking credit card expenses with per-card billing cycles and installments",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js"
+  },
+  "dependencies": {
+    "@line/bot-sdk": "^9.4.2",
+    "@supabase/supabase-js": "^2.45.4",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "ws": "^8.18.0"
+  }
+}
