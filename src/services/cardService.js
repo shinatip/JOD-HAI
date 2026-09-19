@@ -26,4 +26,15 @@ async function getCard(cardId) {
   return data;
 }
 
-module.exports = { createCard, getCards, getCard };
+async function updateLimit(cardId, newLimit) {
+  const { data, error } = await supabase
+    .from('cards')
+    .update({ credit_limit: newLimit })
+    .eq('id', cardId)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+module.exports = { createCard, getCards, getCard, updateLimit };

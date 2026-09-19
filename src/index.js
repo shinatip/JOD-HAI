@@ -28,6 +28,8 @@ async function handleEvent(event) {
 
   const lineUserId = event.source.userId;
   const user = await userService.getOrCreateUser(lineUserId);
+  // console.log(`[event.type]= ${event.type} | type=${event.message.type}`);
+// console.log(`handleEvent:  event=${JSON.stringify(event)}`);
 
   if (event.type === 'message' && event.message.type === 'text') {
     return textHandler.handle(event, user);
@@ -36,7 +38,7 @@ async function handleEvent(event) {
     return postbackHandler.handle(event, user);
   }
   if (event.type === 'follow') {
-    return textHandler.handle({ ...event, message: { type: 'text', text: 'เมนู' } }, user);
+    return textHandler.handle({ ...event, message: { type: 'text', text: 'menu' } }, user);
   }
 }
 

@@ -89,6 +89,33 @@ function generateBillingSchedule({ transactionDate, cutoffDay, amount, isInstall
   return schedule;
 }
 
+/**
+ * Subscriptions (Netflix, Spotify, etc.) recur indefinitely on a fixed
+ * `billing_day` each month, so unlike installments we never pre-generate
+ * rows for them. Instead, this checks — at query time — whether a given
+ * subscription would have charged at some point during a specific billing
+ * cycle, using the same cutoff-date math as everything else. A cycle
+ * spans about a month, so exactly one candidate charge date normally
+ * falls inside it (checked against both the cycle's month and the
+ * month before it, to be safe around month boundaries).
+ */
+function subscriptionOccursInCycle({ billingDay, cutoffDay, cycleEndDate, startDate }) {
+  const cycleEndISO = dateToISO(cycleEndDate);
+  const d = toDateOnly(cycleEndDate);
+  const monthsToCheck = [
+    { y: d.getFullYear(), m: d.getMonth() },
+    { y: d.getMonth() === 0 ? d.getFullYear() - 1 : d.getFullYear(), m: d.getMonth() === 0 ? 11 : d.getMonth() - 1 },
+  ];
+
+  for (const { y, m } of monthsToCheck) {
+    const candidate = cutoffDateForMonth(y, m, billingDay);
+    if (startDate && toDateOnly(candidate) < toDateOnly(startDate)) continue;
+    const candidateCycle = getBillingCycleEnd(candidate, cutoffDay);
+    if (dateToISO(candidateCycle) === cycleEndISO) return true;
+  }
+  return false;
+}
+
 function round2(n) {
   return Math.round(n * 100) / 100;
 }
@@ -105,6 +132,7 @@ module.exports = {
   getBillingCycleEnd,
   getNextCycleEnd,
   generateBillingSchedule,
+  subscriptionOccursInCycle,
   dateToISO,
   round2,
 };
